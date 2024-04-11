@@ -1,0 +1,4 @@
+CMAKE_MINIMUM_REQUIRED(VERSION 3.2)
+project(thread_pool)
+
+ADD_SUBDIRECTORY(src)
