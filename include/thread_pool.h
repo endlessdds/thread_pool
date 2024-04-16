@@ -2,27 +2,26 @@
 #ifndef THREAD_POOL_H
 #define THREAD_POOL_H
 
+#include <condition_variable>
+#include <functional>
+#include <future>
+#include <mutex>
 #include <queue>
 #include <thread>
-#include <mutex>
-#include <functional>
-#include <condition_variable>
-#include <future>
 
-template<typename T>
-class ts_queue {
+template <typename T> class ts_queue {
 public:
   ts_queue() = default;
-  ts_queue(const ts_queue&) = delete;
-  ts_queue(const ts_queue&&) = delete;
+  ts_queue(const ts_queue &) = delete;
+  ts_queue(const ts_queue &&) = delete;
   ~ts_queue() = default;
 
-  void push(const T& t) {
+  void push(const T &t) {
     std::lock_guard lock(mtx_);
     q_.emplace(t);
   }
 
-  bool pop(T& t) {
+  bool pop(T &t) {
     std::lock_guard lock(mtx_);
     if (q_.empty()) {
       return false;
@@ -42,12 +41,11 @@ private:
   std::mutex mtx_;
 };
 
-
 class thread_pool {
 public:
   thread_pool() = default;
-  thread_pool(const thread_pool&) = delete;
-  thread_pool(thread_pool&&) = delete;
+  thread_pool(const thread_pool &) = delete;
+  thread_pool(thread_pool &&) = delete;
   ~thread_pool() { close(); }
 
   void start(std::size_t n) {
@@ -70,11 +68,11 @@ public:
     }
     threads_.clear();
   }
-  
-  template<typename F, typename... Args>
-  auto submit(F&& f, Args&&... args) {
+
+  template <typename F, typename... Args> auto submit(F &&f, Args &&...args) {
     using return_t = decltype(f(args...));
-    std::function<return_t()> task = std::bind(std::forward<F>(f), std::forward<Args>(args)...);
+    std::function<return_t()> task =
+        std::bind(std::forward<F>(f), std::forward<Args>(args)...);
     auto task_ptr = std::make_shared<std::packaged_task<return_t()>>(task);
     q_.push([task_ptr]() { (*task_ptr)(); });
     cv_.notify_one();

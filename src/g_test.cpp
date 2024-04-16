@@ -1,6 +1,6 @@
-#include <gtest/gtest.h>
-#include <bits/stdc++.h>
 #include "../include/thread_pool.h"
+#include <bits/stdc++.h>
+#include <gtest/gtest.h>
 
 using ll = long long;
 std::vector<ll> mem;
@@ -39,7 +39,7 @@ TEST(thread_pool_test, thread_pool) {
   }
 }
 
-int main(int argc, char** argv) {
+int main(int argc, char **argv) {
   testing::InitGoogleTest(&argc, argv);
   return RUN_ALL_TESTS();
 }
